@@ -2,7 +2,7 @@
   "name": "T20 Betting Calculator",
   "short_name": "T20 Bets",
   "description": "Calculate runline, over/under, and match odds for T20 cricket betting",
-  "start_url": "./",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "background_color": "#667eea",
