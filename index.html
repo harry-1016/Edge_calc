@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="theme-color" content="#1e40af">
-    <meta name="description" content="T20 Cricket Betting Calculator - Runline, Over/Under & Match Odds">
+    <meta name="description" content="T20 Cricket Betting Calculator - Complete betting edge analysis">
     <title>T20 Betting Calculator</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="icon-192.png">
@@ -54,10 +54,12 @@
             padding: 10px;
             border-radius: 15px;
             backdrop-filter: blur(10px);
+            flex-wrap: wrap;
         }
 
         .tab {
             flex: 1;
+            min-width: 120px;
             padding: 12px;
             background: rgba(255,255,255,0.2);
             border: none;
@@ -91,10 +93,6 @@
 
         .tab-content.active {
             display: block;
-        }
-
-        .form-group {
-            margin-bottom: 20px;
         }
 
         .form-row {
@@ -344,6 +342,14 @@
             .bet-type-selector {
                 grid-template-columns: 1fr;
             }
+
+            .tabs {
+                flex-direction: column;
+            }
+
+            .tab {
+                min-width: 100%;
+            }
         }
 
         .install-prompt {
@@ -375,7 +381,7 @@
     <div class="container">
         <div class="header">
             <h1>🏏 T20 Betting Calculator</h1>
-            <p>Runline, Over/Under & Match Odds</p>
+            <p>Complete betting edge analysis tool</p>
         </div>
 
         <div class="install-prompt" id="installPrompt">
@@ -385,192 +391,259 @@
         </div>
 
         <div class="tabs">
-            <button class="tab active" onclick="switchTab('calculator')">Calculator</button>
+            <button class="tab active" onclick="switchTab('match_odds')">Match Odds</button>
+            <button class="tab" onclick="switchTab('over_under')">Over/Under</button>
+            <button class="tab" onclick="switchTab('runline')">Runline</button>
+            <button class="tab" onclick="switchTab('live')">Live</button>
             <button class="tab" onclick="switchTab('log')">Bet Log</button>
         </div>
 
-        <!-- CALCULATOR TAB -->
-        <div id="calculator" class="tab-content active">
+        <!-- MATCH ODDS TAB -->
+        <div id="match_odds" class="tab-content active">
             <div class="card">
-                <h2 class="section-title">Select Bet Type</h2>
-                <div class="bet-type-selector">
-                    <div class="bet-type-btn active" onclick="selectBetType('match_odds')">
-                        <div style="font-size: 1.5rem; margin-bottom: 5px;">🏆</div>
-                        <div>Match Odds</div>
-                    </div>
-                    <div class="bet-type-btn" onclick="selectBetType('over_under')">
-                        <div style="font-size: 1.5rem; margin-bottom: 5px;">📊</div>
-                        <div>Over/Under</div>
-                    </div>
-                    <div class="bet-type-btn" onclick="selectBetType('runline')">
-                        <div style="font-size: 1.5rem; margin-bottom: 5px;">📈</div>
-                        <div>Runline</div>
-                    </div>
-                </div>
-
                 <h2 class="section-title">Match Details</h2>
                 <div class="form-row">
                     <div>
                         <label>Team A</label>
-                        <input type="text" id="teamA" placeholder="e.g., Mumbai Indians">
+                        <input type="text" id="teamA_mo" placeholder="e.g., Mumbai Indians">
                     </div>
                     <div>
                         <label>Team B</label>
-                        <input type="text" id="teamB" placeholder="e.g., Chennai Super Kings">
+                        <input type="text" id="teamB_mo" placeholder="e.g., Chennai Super Kings">
                     </div>
                 </div>
 
-                <!-- MATCH ODDS SECTION -->
-                <div id="matchOddsSection">
-                    <h2 class="section-title">Team Statistics</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Team A Recent Form %</label>
-                            <input type="number" id="formA" value="50" min="0" max="100">
-                            <div class="help-text">Win % in last 10 matches</div>
-                        </div>
-                        <div>
-                            <label>Team B Recent Form %</label>
-                            <input type="number" id="formB" value="50" min="0" max="100">
-                        </div>
+                <h2 class="section-title">Team Statistics</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Recent Form %</label>
+                        <input type="number" id="formA_mo" value="50" min="0" max="100">
+                        <div class="help-text">Win % in last 10 matches</div>
                     </div>
-                    <div class="form-row">
-                        <div>
-                            <label>Team A Squad Rating</label>
-                            <input type="number" id="squadA" value="75" min="0" max="100">
-                        </div>
-                        <div>
-                            <label>Team B Squad Rating</label>
-                            <input type="number" id="squadB" value="70" min="0" max="100">
-                        </div>
+                    <div>
+                        <label>Team B Recent Form %</label>
+                        <input type="number" id="formB_mo" value="50" min="0" max="100">
                     </div>
-
-                    <h2 class="section-title">Bookmaker Odds</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Team A Odds (Decimal)</label>
-                            <input type="number" id="oddsA" value="1.90" step="0.01" min="1.01">
-                        </div>
-                        <div>
-                            <label>Team B Odds (Decimal)</label>
-                            <input type="number" id="oddsB" value="2.00" step="0.01" min="1.01">
-                        </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Squad Rating</label>
+                        <input type="number" id="squadA_mo" value="75" min="0" max="100">
+                    </div>
+                    <div>
+                        <label>Team B Squad Rating</label>
+                        <input type="number" id="squadB_mo" value="70" min="0" max="100">
                     </div>
                 </div>
 
-                <!-- OVER/UNDER SECTION -->
-                <div id="overUnderSection" style="display: none;">
-                    <h2 class="section-title">Over/Under Settings</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Line (Total Runs)</label>
-                            <input type="number" id="totalLine" value="165.5" step="0.5" min="100" max="250">
-                            <div class="help-text">Bookmaker's total runs line</div>
-                        </div>
-                        <div>
-                            <label>Innings</label>
-                            <select id="innings">
-                                <option value="1st">1st Innings</option>
-                                <option value="2nd">2nd Innings</option>
-                                <option value="match">Full Match</option>
-                            </select>
-                        </div>
+                <h2 class="section-title">Bookmaker Odds</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Odds (Decimal)</label>
+                        <input type="number" id="oddsA_mo" value="1.90" step="0.01" min="1.01">
                     </div>
-                    
-                    <h2 class="section-title">Batting Team Stats</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Average Score (Last 5)</label>
-                            <input type="number" id="avgScore" value="170" min="100" max="250">
-                        </div>
-                        <div>
-                            <label>Powerplay Strike Rate</label>
-                            <input type="number" id="ppSR" value="130" min="80" max="200">
-                        </div>
-                    </div>
-
-                    <h2 class="section-title">Bowling Team Stats</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Average Runs Conceded</label>
-                            <input type="number" id="runsConc" value="165" min="100" max="250">
-                        </div>
-                        <div>
-                            <label>Economy Rate</label>
-                            <input type="number" id="economy" value="8.5" step="0.1" min="5" max="12">
-                        </div>
-                    </div>
-
-                    <h2 class="section-title">Bookmaker Odds</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Over Odds (Decimal)</label>
-                            <input type="number" id="overOdds" value="1.90" step="0.01" min="1.01">
-                        </div>
-                        <div>
-                            <label>Under Odds (Decimal)</label>
-                            <input type="number" id="underOdds" value="1.90" step="0.01" min="1.01">
-                        </div>
+                    <div>
+                        <label>Team B Odds (Decimal)</label>
+                        <input type="number" id="oddsB_mo" value="2.00" step="0.01" min="1.01">
                     </div>
                 </div>
 
-                <!-- RUNLINE SECTION -->
-                <div id="runlineSection" style="display: none;">
-                    <h2 class="section-title">Runline Settings</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Runline (Runs)</label>
-                            <input type="number" id="runlineValue" value="10.5" step="0.5" min="-50" max="50">
-                            <div class="help-text">Positive = Team A favored</div>
-                        </div>
-                        <div>
-                            <label>Favorite Team</label>
-                            <select id="favoriteTeam">
-                                <option value="A">Team A</option>
-                                <option value="B">Team B</option>
-                            </select>
-                        </div>
-                    </div>
+                <button class="btn" onclick="calculateMatchOdds()">Calculate Edge</button>
+                <div id="result_mo"></div>
+            </div>
+        </div>
 
-                    <h2 class="section-title">Team Strength Analysis</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Team A Win Margin Average</label>
-                            <input type="number" id="marginA" value="15" min="-50" max="100">
-                            <div class="help-text">Average runs when winning</div>
-                        </div>
-                        <div>
-                            <label>Team B Win Margin Average</label>
-                            <input type="number" id="marginB" value="12" min="-50" max="100">
-                        </div>
+        <!-- OVER/UNDER TAB -->
+        <div id="over_under" class="tab-content">
+            <div class="card">
+                <h2 class="section-title">Over/Under Settings</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Batting Team</label>
+                        <input type="text" id="teamA_ou" placeholder="e.g., Mumbai Indians">
                     </div>
-                    <div class="form-row">
-                        <div>
-                            <label>Team A Recent Form %</label>
-                            <input type="number" id="formRunlineA" value="60" min="0" max="100">
-                        </div>
-                        <div>
-                            <label>Team B Recent Form %</label>
-                            <input type="number" id="formRunlineB" value="40" min="0" max="100">
-                        </div>
+                    <div>
+                        <label>Line (Total Runs)</label>
+                        <input type="number" id="totalLine_ou" value="165.5" step="0.5" min="100" max="250">
+                        <div class="help-text">Bookmaker's total runs line</div>
                     </div>
-
-                    <h2 class="section-title">Bookmaker Odds</h2>
-                    <div class="form-row">
-                        <div>
-                            <label>Team A Runline Odds</label>
-                            <input type="number" id="runlineOddsA" value="1.90" step="0.01" min="1.01">
-                        </div>
-                        <div>
-                            <label>Team B Runline Odds</label>
-                            <input type="number" id="runlineOddsB" value="1.90" step="0.01" min="1.01">
-                        </div>
+                </div>
+                
+                <h2 class="section-title">Batting Team Stats</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Average Score (Last 5)</label>
+                        <input type="number" id="avgScore_ou" value="170" min="100" max="250">
+                    </div>
+                    <div>
+                        <label>Powerplay Strike Rate</label>
+                        <input type="number" id="ppSR_ou" value="130" min="80" max="200">
                     </div>
                 </div>
 
-                <button class="btn" onclick="calculate()">Calculate Bet Suggestion</button>
+                <h2 class="section-title">Bowling Team Stats</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Average Runs Conceded</label>
+                        <input type="number" id="runsConc_ou" value="165" min="100" max="250">
+                    </div>
+                    <div>
+                        <label>Economy Rate</label>
+                        <input type="number" id="economy_ou" value="8.5" step="0.1" min="5" max="12">
+                    </div>
+                </div>
 
-                <div id="result"></div>
+                <h2 class="section-title">Bookmaker Odds</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Over Odds (Decimal)</label>
+                        <input type="number" id="overOdds_ou" value="1.90" step="0.01" min="1.01">
+                    </div>
+                    <div>
+                        <label>Under Odds (Decimal)</label>
+                        <input type="number" id="underOdds_ou" value="1.90" step="0.01" min="1.01">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateOverUnder()">Calculate Edge</button>
+                <div id="result_ou"></div>
+            </div>
+        </div>
+
+        <!-- RUNLINE TAB -->
+        <div id="runline" class="tab-content">
+            <div class="card">
+                <h2 class="section-title">Match Details</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A</label>
+                        <input type="text" id="teamA_rl" placeholder="e.g., Mumbai Indians">
+                    </div>
+                    <div>
+                        <label>Team B</label>
+                        <input type="text" id="teamB_rl" placeholder="e.g., Chennai Super Kings">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Runline Settings</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Runline (Runs)</label>
+                        <input type="number" id="runlineValue_rl" value="10.5" step="0.5" min="-50" max="50">
+                        <div class="help-text">Positive = Team A favored</div>
+                    </div>
+                    <div>
+                        <label>Favorite Team</label>
+                        <select id="favoriteTeam_rl">
+                            <option value="A">Team A</option>
+                            <option value="B">Team B</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Team Strength Analysis</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Win Margin Average</label>
+                        <input type="number" id="marginA_rl" value="15" min="-50" max="100">
+                        <div class="help-text">Average runs when winning</div>
+                    </div>
+                    <div>
+                        <label>Team B Win Margin Average</label>
+                        <input type="number" id="marginB_rl" value="12" min="-50" max="100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Recent Form %</label>
+                        <input type="number" id="formA_rl" value="60" min="0" max="100">
+                    </div>
+                    <div>
+                        <label>Team B Recent Form %</label>
+                        <input type="number" id="formB_rl" value="40" min="0" max="100">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Bookmaker Odds</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Runline Odds</label>
+                        <input type="number" id="runlineOddsA_rl" value="1.90" step="0.01" min="1.01">
+                    </div>
+                    <div>
+                        <label>Team B Runline Odds</label>
+                        <input type="number" id="runlineOddsB_rl" value="1.90" step="0.01" min="1.01">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateRunline()">Calculate Edge</button>
+                <div id="result_rl"></div>
+            </div>
+        </div>
+
+        <!-- LIVE TAB -->
+        <div id="live" class="tab-content">
+            <div class="card">
+                <h2 class="section-title">Match Situation</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Batting Team</label>
+                        <input type="text" id="battingTeam_live" placeholder="Team name">
+                    </div>
+                    <div>
+                        <label>Target / Projected Score</label>
+                        <input type="number" id="target_live" value="180" min="100" max="250">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Current State</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Current Score</label>
+                        <input type="number" id="currentScore_live" value="85" min="0">
+                    </div>
+                    <div>
+                        <label>Wickets Lost</label>
+                        <input type="number" id="wickets_live" value="2" min="0" max="10">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Overs Completed</label>
+                        <input type="number" id="overs_live" value="10.0" step="0.1" min="0" max="20">
+                    </div>
+                    <div>
+                        <label>Current Odds (Batting Team)</label>
+                        <input type="number" id="liveOdds_live" value="2.50" step="0.01" min="1.01">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Quality Adjustments</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Batsmen at Crease Quality</label>
+                        <select id="batsmenQuality_live">
+                            <option value="-10">Weak tail-enders</option>
+                            <option value="-5">Below average</option>
+                            <option value="0" selected>Average</option>
+                            <option value="5">Above average</option>
+                            <option value="10">Elite power hitters</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Bowlers Remaining Quality</label>
+                        <select id="bowlersQuality_live">
+                            <option value="-10">Weak bowlers left</option>
+                            <option value="-5">Below average</option>
+                            <option value="0" selected>Average</option>
+                            <option value="5">Above average</option>
+                            <option value="10">Elite death bowlers</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateLive()">Calculate Win Probability</button>
+                <div id="result_live"></div>
             </div>
         </div>
 
@@ -585,10 +658,11 @@
                     </div>
                     <div>
                         <label>Bet Type</label>
-                        <select id="betTypeLog">
+                        <select id="betType">
                             <option>Match Odds</option>
                             <option>Over/Under</option>
                             <option>Runline</option>
+                            <option>Live</option>
                         </select>
                     </div>
                 </div>
@@ -627,7 +701,7 @@
                 <button class="btn" onclick="addBet()">Add Bet to Log</button>
 
                 <h2 class="section-title">Performance Summary</h2>
-                <div class="stats-grid" id="statsGrid">
+                <div class="stats-grid">
                     <div class="stat-card">
                         <label>Total Bets</label>
                         <div class="stat-value" id="totalBets">0</div>
@@ -679,8 +753,8 @@
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('./sw.js')
-                    .then(reg => console.log('Service Worker registered', reg))
-                    .catch(err => console.log('Service Worker registration failed:', err));
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
             });
         }
 
