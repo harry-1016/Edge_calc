@@ -1,0 +1,684 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#1e40af">
+    <meta name="description" content="T20 Cricket Betting Edges Calculator - Find value bets with data-driven analysis">
+    <title>T20 Betting Edges</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="icon-192.png">
+    <link rel="apple-touch-icon" href="icon-512.png">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #1f2937;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .header p {
+            opacity: 0.9;
+            font-size: 1rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 12px;
+            background: rgba(255,255,255,0.2);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .tab.active {
+            background: white;
+            color: #667eea;
+        }
+
+        .tab:hover {
+            transform: translateY(-2px);
+        }
+
+        .card {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #374151;
+            font-size: 0.9rem;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: border-color 0.3s;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #667eea;
+            margin: 25px 0 15px 0;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .result-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .result-box h3 {
+            font-size: 1.1rem;
+            margin-bottom: 10px;
+            opacity: 0.9;
+        }
+
+        .result-box .value {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: rgba(255,255,255,0.1);
+            padding: 15px;
+            border-radius: 10px;
+            backdrop-filter: blur(10px);
+        }
+
+        .result-item label {
+            color: rgba(255,255,255,0.8);
+            font-size: 0.85rem;
+            margin-bottom: 5px;
+        }
+
+        .result-item .value {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .edge-indicator {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin-top: 10px;
+        }
+
+        .edge-positive {
+            background: #10b981;
+            color: white;
+        }
+
+        .edge-negative {
+            background: #ef4444;
+            color: white;
+        }
+
+        .edge-neutral {
+            background: #6b7280;
+            color: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s;
+            margin-top: 15px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .log-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            font-size: 0.9rem;
+        }
+
+        .log-table th {
+            background: #f3f4f6;
+            padding: 12px 8px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid #e5e7eb;
+        }
+
+        .log-table td {
+            padding: 12px 8px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+
+        .profit {
+            color: #10b981;
+            font-weight: 600;
+        }
+
+        .loss {
+            color: #ef4444;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .stat-card {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            border-left: 4px solid #667eea;
+        }
+
+        .stat-card label {
+            font-size: 0.85rem;
+            color: #6b7280;
+        }
+
+        .stat-card .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: #1f2937;
+            margin-top: 5px;
+        }
+
+        .help-text {
+            font-size: 0.85rem;
+            color: #6b7280;
+            margin-top: 5px;
+            font-style: italic;
+        }
+
+        @media (max-width: 640px) {
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            
+            .result-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 1.5rem;
+            }
+
+            .log-table {
+                font-size: 0.75rem;
+            }
+
+            .log-table th, .log-table td {
+                padding: 8px 4px;
+            }
+        }
+
+        .install-prompt {
+            background: #fef3c7;
+            border: 2px solid #f59e0b;
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .install-prompt.show {
+            display: block;
+        }
+
+        .install-prompt button {
+            background: #f59e0b;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🏏 T20 Betting Edges</h1>
+            <p>Find value bets with data-driven analysis</p>
+        </div>
+
+        <div class="install-prompt" id="installPrompt">
+            <strong>📲 Install this app</strong>
+            <p>Add to your home screen for quick access!</p>
+            <button id="installBtn">Install App</button>
+        </div>
+
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('prematch')">Pre-Match</button>
+            <button class="tab" onclick="switchTab('live')">Live</button>
+            <button class="tab" onclick="switchTab('log')">Bet Log</button>
+        </div>
+
+        <!-- PRE-MATCH TAB -->
+        <div id="prematch" class="tab-content active">
+            <div class="card">
+                <h2 class="section-title">Match Details</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A</label>
+                        <input type="text" id="teamA" placeholder="e.g., Mumbai Indians">
+                    </div>
+                    <div>
+                        <label>Team B</label>
+                        <input type="text" id="teamB" placeholder="e.g., Chennai Super Kings">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Venue</label>
+                        <input type="text" id="venue" placeholder="e.g., Wankhede Stadium">
+                    </div>
+                    <div>
+                        <label>League</label>
+                        <select id="league">
+                            <option>IPL</option>
+                            <option>BBL</option>
+                            <option>CPL</option>
+                            <option>PSL</option>
+                            <option>The Hundred</option>
+                            <option>Other</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Team Strength (0-100)</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Recent Form %</label>
+                        <input type="number" id="formA" value="50" min="0" max="100">
+                        <div class="help-text">Win % in last 10 matches</div>
+                    </div>
+                    <div>
+                        <label>Team B Recent Form %</label>
+                        <input type="number" id="formB" value="50" min="0" max="100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Squad Quality</label>
+                        <input type="number" id="squadA" value="75" min="0" max="100">
+                        <div class="help-text">Overall squad rating</div>
+                    </div>
+                    <div>
+                        <label>Team B Squad Quality</label>
+                        <input type="number" id="squadB" value="70" min="0" max="100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Powerplay Runs/Over</label>
+                        <input type="number" id="ppA" value="8.5" step="0.1" min="5" max="12">
+                        <div class="help-text">Typical: 7-10 RPO</div>
+                    </div>
+                    <div>
+                        <label>Team B Powerplay Runs/Over</label>
+                        <input type="number" id="ppB" value="7.8" step="0.1" min="5" max="12">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Death Bowling Economy</label>
+                        <input type="number" id="deathA" value="9.0" step="0.1" min="6" max="15">
+                        <div class="help-text">Lower is better</div>
+                    </div>
+                    <div>
+                        <label>Team B Death Bowling Economy</label>
+                        <input type="number" id="deathB" value="10.5" step="0.1" min="6" max="15">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Venue & Conditions</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Average Score at Venue</label>
+                        <input type="number" id="avgScore" value="170" min="120" max="220">
+                    </div>
+                    <div>
+                        <label>Toss Impact</label>
+                        <select id="tossImpact">
+                            <option value="neutral">Neutral (50/50)</option>
+                            <option value="slight">Slight Advantage (55/45)</option>
+                            <option value="moderate">Moderate (60/40)</option>
+                            <option value="high">High (65/35)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Dew Factor</label>
+                        <select id="dew">
+                            <option value="no">No Dew</option>
+                            <option value="slight">Slight Dew</option>
+                            <option value="heavy">Heavy Dew</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Pitch Type</label>
+                        <select id="pitch">
+                            <option value="flat">Flat/Batting</option>
+                            <option value="balanced">Balanced</option>
+                            <option value="slow">Slow/Turning</option>
+                        </select>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Bookmaker Odds</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Team A Odds (Decimal)</label>
+                        <input type="number" id="oddsA" value="1.90" step="0.01" min="1.01">
+                    </div>
+                    <div>
+                        <label>Team B Odds (Decimal)</label>
+                        <input type="number" id="oddsB" value="2.00" step="0.01" min="1.01">
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculatePrematch()">Calculate Edge</button>
+
+                <div id="prematchResult"></div>
+            </div>
+        </div>
+
+        <!-- LIVE TAB -->
+        <div id="live" class="tab-content">
+            <div class="card">
+                <h2 class="section-title">Match Situation</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Batting Team</label>
+                        <input type="text" id="battingTeam" placeholder="Team name">
+                    </div>
+                    <div>
+                        <label>Target / Projected Score</label>
+                        <input type="number" id="target" value="180" min="100" max="250">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Current State</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Current Score</label>
+                        <input type="number" id="currentScore" value="85" min="0">
+                    </div>
+                    <div>
+                        <label>Wickets Lost</label>
+                        <input type="number" id="wickets" value="2" min="0" max="10">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Overs Completed</label>
+                        <input type="number" id="overs" value="10.0" step="0.1" min="0" max="20">
+                    </div>
+                    <div>
+                        <label>Current Odds (Batting Team)</label>
+                        <input type="number" id="liveOdds" value="2.50" step="0.01" min="1.01">
+                    </div>
+                </div>
+
+                <h2 class="section-title">Quality Adjustments</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Batsmen at Crease Quality</label>
+                        <select id="batsmenQuality">
+                            <option value="-10">Weak tail-enders</option>
+                            <option value="-5">Below average</option>
+                            <option value="0" selected>Average</option>
+                            <option value="5">Above average</option>
+                            <option value="10">Elite power hitters</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label>Bowlers Remaining Quality</label>
+                        <select id="bowlersQuality">
+                            <option value="-10">Weak bowlers left</option>
+                            <option value="-5">Below average</option>
+                            <option value="0" selected>Average</option>
+                            <option value="5">Above average</option>
+                            <option value="10">Elite death bowlers</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="calculateLive()">Calculate Win Probability</button>
+
+                <div id="liveResult"></div>
+            </div>
+        </div>
+
+        <!-- BET LOG TAB -->
+        <div id="log" class="tab-content">
+            <div class="card">
+                <h2 class="section-title">Add New Bet</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Date</label>
+                        <input type="date" id="betDate" value="">
+                    </div>
+                    <div>
+                        <label>League</label>
+                        <input type="text" id="betLeague" placeholder="IPL, BBL, etc.">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Match</label>
+                        <input type="text" id="betMatch" placeholder="Team A vs Team B">
+                    </div>
+                    <div>
+                        <label>Bet Type</label>
+                        <select id="betType">
+                            <option>Pre-match</option>
+                            <option>In-play</option>
+                            <option>Totals</option>
+                            <option>Player Props</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Selection</label>
+                        <input type="text" id="betSelection" placeholder="Team/Market">
+                    </div>
+                    <div>
+                        <label>Your Win % Estimate</label>
+                        <input type="number" id="betWinProb" placeholder="55" min="0" max="100">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Odds (Decimal)</label>
+                        <input type="number" id="betOdds" placeholder="2.00" step="0.01" min="1.01">
+                    </div>
+                    <div>
+                        <label>Stake</label>
+                        <input type="number" id="betStake" placeholder="20" step="0.1" min="0">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Result</label>
+                        <select id="betResult">
+                            <option value="">Pending</option>
+                            <option value="won">Won</option>
+                            <option value="lost">Lost</option>
+                            <option value="void">Void</option>
+                        </select>
+                    </div>
+                </div>
+
+                <button class="btn" onclick="addBet()">Add Bet to Log</button>
+
+                <h2 class="section-title">Performance Summary</h2>
+                <div class="stats-grid" id="statsGrid">
+                    <div class="stat-card">
+                        <label>Total Bets</label>
+                        <div class="stat-value" id="totalBets">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Win Rate</label>
+                        <div class="stat-value" id="winRate">0%</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>Total P/L</label>
+                        <div class="stat-value" id="totalPL">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <label>ROI</label>
+                        <div class="stat-value" id="roi">0%</div>
+                    </div>
+                </div>
+
+                <h2 class="section-title">Bet History</h2>
+                <div style="overflow-x: auto;">
+                    <table class="log-table">
+                        <thead>
+                            <tr>
+                                <th>Date</th>
+                                <th>Match</th>
+                                <th>Selection</th>
+                                <th>Odds</th>
+                                <th>Stake</th>
+                                <th>Result</th>
+                                <th>P/L</th>
+                            </tr>
+                        </thead>
+                        <tbody id="betLogBody">
+                            <tr>
+                                <td colspan="7" style="text-align: center; padding: 30px; color: #6b7280;">
+                                    No bets logged yet. Add your first bet above!
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registered'))
+                    .catch(err => console.log('Service Worker registration failed'));
+            });
+        }
+
+        // Set today's date as default
+        document.getElementById('betDate').valueAsDate = new Date();
+    </script>
+</body>
+</html>
