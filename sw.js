@@ -1,4 +1,4 @@
-const CACHE_NAME = 't20-betting-calculator-v1';
+const CACHE_NAME = 't20-betting-calculator-v2';
 const urlsToCache = [
   './',
   './index.html',
@@ -8,46 +8,66 @@ const urlsToCache = [
 
 // Install service worker
 self.addEventListener('install', event => {
+  console.log('[SW] Installing...');
   event.waitUntil(
     caches.open(CACHE_NAME)
       .then(cache => {
-        console.log('Opened cache');
+        console.log('[SW] Caching files');
         return cache.addAll(urlsToCache);
       })
       .catch(err => {
-        console.error('Cache installation failed:', err);
+        console.error('[SW] Cache installation failed:', err);
       })
   );
   self.skipWaiting();
 });
 
-// Fetch from cache
+// Fetch from cache with fallback
 self.addEventListener('fetch', event => {
   event.respondWith(
     caches.match(event.request)
       .then(response => {
-        // Cache hit - return response
         if (response) {
+          console.log('[SW] Serving from cache:', event.request.url);
           return response;
         }
-        // Not in cache - fetch from network
-        return fetch(event.request).catch(() => {
-          // If fetch fails and not in cache, return offline page or error
-          console.log('Fetch failed for:', event.request.url);
+        
+        console.log('[SW] Fetching from network:', event.request.url);
+        return fetch(event.request).then(fetchResponse => {
+          // Don't cache if not a success
+          if (!fetchResponse || fetchResponse.status !== 200) {
+            return fetchResponse;
+          }
+          
+          // Clone the response
+          const responseToCache = fetchResponse.clone();
+          
+          caches.open(CACHE_NAME).then(cache => {
+            cache.put(event.request, responseToCache);
+          });
+          
+          return fetchResponse;
+        }).catch(err => {
+          console.error('[SW] Fetch failed:', err);
+          // If it's a navigation request and we're offline, serve index.html from cache
+          if (event.request.mode === 'navigate') {
+            return caches.match('./index.html');
+          }
         });
-      }
-    )
+      })
   );
 });
 
 // Activate and clean old caches
 self.addEventListener('activate', event => {
+  console.log('[SW] Activating...');
   const cacheWhitelist = [CACHE_NAME];
   event.waitUntil(
     caches.keys().then(cacheNames => {
       return Promise.all(
         cacheNames.map(cacheName => {
           if (cacheWhitelist.indexOf(cacheName) === -1) {
+            console.log('[SW] Deleting old cache:', cacheName);
             return caches.delete(cacheName);
           }
         })
